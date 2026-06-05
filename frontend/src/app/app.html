@@ -1,0 +1,11 @@
+<div class="card bg-base-100 shadow-xl w-1/2 mx-auto p-10 mt-10">
+  <h3 class="text-3xl text-red-500">Welcome to {{ title() }}</h3>
+  <ul class="list">
+    @for (user of users(); track user.id) {
+      <li class="list-row items-center">
+        <img src="/default-user.png" alt="no avatar" class="rounded-box size-12">
+      </li>
+      <div>{{user.displayName}}</div>
+    }
+  </ul>
+</div>
