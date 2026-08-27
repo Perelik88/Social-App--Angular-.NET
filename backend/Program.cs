@@ -1,5 +1,7 @@
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using backend.Interfaces;
+using backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,8 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
