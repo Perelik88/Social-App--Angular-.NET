@@ -1,0 +1,67 @@
+<div class="flex items-center justify-center min-h-[80vh] px-4">
+  <form
+    #registerForm="ngForm"
+    class="card w-full max-w-sm bg-base-100 shadow-xl overflow-hidden"
+    (ngSubmit)="register()"
+  >
+    <div class="p-6 bg-linear-to-r from-primary to-black text-white text-center">
+      <h2 class="text-xl font-bold">Create your account</h2>
+      <p class="text-sm opacity-80">Join SocialAppDemo today</p>
+    </div>
+
+    <div class="card-body gap-3">
+      <label class="input w-full">
+        <span class="label">Name</span>
+        <input
+          type="text"
+          name="displayName"
+          placeholder="Display name"
+          autocomplete="name"
+          required
+          [(ngModel)]="creds.displayName"
+        />
+      </label>
+
+      <label class="input w-full">
+        <span class="label">Email</span>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          autocomplete="email"
+          required
+          [(ngModel)]="creds.email"
+        />
+      </label>
+
+      <label class="input w-full">
+        <span class="label">Password</span>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          autocomplete="new-password"
+          minlength="6"
+          required
+          [(ngModel)]="creds.password"
+        />
+      </label>
+
+      @if (errorMessage) {
+        <p class="text-error text-sm">{{ errorMessage }}</p>
+      }
+
+      <div class="card-actions justify-end mt-2">
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button
+          type="submit"
+          class="btn bg-primary text-white hover:bg-black"
+          [disabled]="!registerForm.valid"
+        >
+          Register
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+

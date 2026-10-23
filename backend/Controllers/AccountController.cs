@@ -31,13 +31,7 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
-        return new UserDTO
-        {
-            Id = user.Id,
-            Email = user.Email,
-            DisplayName = user.DisplayName,
-            Token = tokenService.CreateToken(user)
-        };
+        return user.ToUserDTO(tokenService);
     }
 
     [HttpPost("login")]
@@ -49,24 +43,24 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
             return Unauthorized("Invalid email or password");
         }
 
+        var passwordHash = user.PasswordHash;
+        if (passwordHash is null || user.PasswordSalt is null)
+        {
+            return Unauthorized("Invalid email or password");
+        }
+
         using var hmac = new HMACSHA512(user.PasswordSalt);
         var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(loginUserDTO.Password));
 
         for (int i = 0; i < computedHash.Length; i++)
         {
-            if (computedHash[i] != user.PasswordHash[i])
-            {
+            if (computedHash[i] != passwordHash[i])
+            {   
                 return Unauthorized("Invalid email or password");
             }
         }
 
-        return new UserDTO
-        {
-            Id = user.Id,
-            Email = user.Email,
-            DisplayName = user.DisplayName,
-            Token = tokenService.CreateToken(user)
-        };
+        return user.ToUserDTO(tokenService);
     }
 
     private async Task<bool> UserExists(string email)
