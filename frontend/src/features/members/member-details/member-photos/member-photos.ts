@@ -4,8 +4,6 @@ import { MemberService } from '../../../../core/services/member-service';
 import { Photo } from '../../../../interfaces/photo';
 import { PhotoUpload } from '../../../../shared/photo-upload/photo-upload';
 import { AccountService } from '../../../../core/services/account-service';
-import { User } from '../../../../interfaces/user';
-import { Member } from '../../../../interfaces/member';
 import { StarButton } from '../../../../shared/star-button/star-button';
 import { DeleteButton } from '../../../../shared/delete-button/delete-button';
 
@@ -47,6 +45,9 @@ export class MemberPhotos {
         this.memberService.editMode.set(false);
         this.loading.set(false);
         this.photos.update((photos) => [...photos, photo]);
+        if(!this.memberService.member()?.imageUrl) {
+          this.setMainLocalPhoto(photo);
+        }
       },
       error: (error) => {
         console.error('Error uploading photo:', error);
@@ -60,15 +61,7 @@ export class MemberPhotos {
     this.loading.set(true);
     this.memberService.setMainPhoto(photo).subscribe({
       next: () => {
-        const currentUser = this.accountService.currentUser();
-        if (currentUser) {
-          currentUser.imageUrl = photo.url;
-          this.accountService.setCurrentUser(currentUser as User);
-          this.memberService.member.update((member) => ({
-            ...member,
-            imageUrl: photo.url
-          }) as Member);
-        }
+        this.setMainLocalPhoto(photo);
         this.loading.set(false);
       }
     });
@@ -86,5 +79,15 @@ export class MemberPhotos {
         this.loading.set(false);
       }
     });
+  }
+
+  private setMainLocalPhoto(photo: Photo) {
+    const currentUser = this.accountService.currentUser();
+    if (currentUser) {
+      this.accountService.setCurrentUser({ ...currentUser, imageUrl: photo.url });
+    }
+    this.memberService.member.update((member) =>
+      member ? { ...member, imageUrl: photo.url } : member
+    );
   }
 }
